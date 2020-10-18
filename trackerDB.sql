@@ -12,11 +12,15 @@ CREATE TABLE departments(
 CREATE TABLE roles(
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(30) NOT NULL,
-  salary VARCHAR(30) NOT NULL,
-  dept_id INT NOT NULL,
+  salary VARCHAR(30),
+  dept_id INT,
   PRIMARY KEY (id)
 
 );
+
+-- creates a first role as manager
+INSERT INTO roles(id,title)
+VALUES (1,'Manager');
 
 CREATE TABLE employees(
   id INT NOT NULL AUTO_INCREMENT,
@@ -26,3 +30,5 @@ CREATE TABLE employees(
   manager_id VARCHAR(30),
   PRIMARY KEY (id)
 );
+
+
