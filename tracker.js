@@ -121,25 +121,40 @@ function addRole() {
                     choices: departmentNames
                 }
             ]).then(function (answer) {
-                
-                console.log(answer.roleDept)
-                var dept = departmentList.find(department => department.dept_name === answer)
+
+                var dept = departmentList.find(department => department.dept_name === answer.roleDept)
 
                 var query = connection.query(
-                    'INSERT INTO departments SET ?',
+                    'INSERT INTO roles SET ?',
                     [{
                         title: answer.roleTitle,
                         salary: answer.roleSalary,
-                        department_id: dept.id
-
+                        dept_id: dept.id
                     }]
-                )
+                );
+                start();
             })
     })
 }
 
 function addEmployee() {
+    connection.query("SELECT * FROM roles", function (err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
 
+        //creates an array of just item names
+        var roleNames = res.map(role => role.title);
+        var roleList = res
+
+        inquirer
+            .prompt([
+                {
+
+                }
+            ])
+
+
+    })
 }
 
 
