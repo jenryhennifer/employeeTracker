@@ -1,7 +1,6 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 
-
 var connection = mysql.createConnection({
     host: 'localhost',
 
@@ -46,6 +45,7 @@ function start() {
             }
         })
 }
+
 
 function add() {
     inquirer
@@ -170,7 +170,7 @@ function addEmployee() {
                                 message: 'Last Name: '
                             }
                         ]).then(function (answer) {
-                            var query = connection.query(
+                            var query = connection.connection.query(
                                 'INSERT INTO employees SET ?',
                                 [{
                                     first_name: answer.firstName,
@@ -181,64 +181,100 @@ function addEmployee() {
                             );
                             start();
                         })
-                } else {
-                    runEmployeeQuestions();
+                } else {  //NEED TO ACCESS ROLES CHECK IF YOU CAN SELECT FROM BOTH :) 
+                    connection.query('SELECT * FROM employees WHERE role_id = 1', function (err, response) {
+                        if (err) throw err;
+
+                        const managerNames = response.map(name => name.first_name);
+                        const managerList = response
+
+                        console.log(managerList)
+                        inquirer
+                            .prompt([
+                                {
+                                    type: 'input',
+                                    name: 'firstName',
+                                    message: 'First Name: '
+                                },
+                                {
+                                    type: 'input',
+                                    name: 'lastName',
+                                    message: 'Last Name: '
+                                },
+                                {
+                                    type: 'list',
+                                    name: 'manager',
+                                    message: 'Manager: ',
+                                    choices: managerNames
+                                }
+                            ]).then(function (answer) {
+                                var manager = managerList.find(man => man.first_name === answer.manager)
+
+                                var query = connection.query(
+                                    'INSERT INTO employees SET ?',
+                                    [{
+                                        first_name: answer.firstName,
+                                        last_name: answer.lastName,
+                                        role_id: '2',
+                                        manager_id: manager.id
+
+                                    }]
+                                );
+                                start();
+                            })
+                    })
                 }
             })
 
 
     })
 }
-
-function runEmployeeQuestions() {
-    connection.query('SELECT * FROM employees', function (err, res) {
-        if (err) throw err;
-        console.log(res)
-        const managerFilter = res.find(manID => manID.role_id === 1)
-        inquirer
-            .prompt([
-                {
-                    type: 'input',
-                    name: 'firstName',
-                    message: 'First Name: '
-                },
-                {
-                    type: 'input',
-                    name: 'lastName',
-                    message: 'Last Name: '
-                },
-                {
-                    type: 'list',
-                    name: 'role',
-                    message: 'Role: ',
-                    choices: roleNames
-                },
-                {
-                    type: 'list',
-                    name: 'manager',
-                    message: 'Manager: ',
-                    choices: managerFilter
-                }
-            ]).then(function (answer) {
-
-                var query = connection.query(
-                    'INSERT INTO employees SET ?',
-                    [{
-                        first_name: answer.firstName,
-                        last_name: answer.lastName,
-                        role_id: answer.role,
-                 
-                    }]
-                );
-                start();
-            })
-    })
-}
-
 
 function view() {
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'viewChoice',
+                message: 'What would you like to view?',
+                choices: ['All Departments', 'Roles', 'Employees', 'Back']
+            }
+        ]).then(function (res) {
+            switch (res.viewChoice) {
+                case 'All Departments':
+                    return showDepartments();
+                case 'All Roles':
+                    return showRoles();
+                case 'All Employees':
+                    return showEmployees();
+                default:
+                    return start();
+            }
+        })
+}
+
+function showDepartments() {
+    connection.query('SELECT * FROM departments', function (err, res) {
+        if (err) throw err;
+
+        const renderDepartmentInformation = function () {
+            res.forEach(item => {
+                console.log(item.id + '   ' + item.dept_name)
+            })
+        }
+        console.log('DEPARTMENTS')
+        console.log('id' + '  ' + 'name')
+        renderDepartmentInformation();
+
+    })
+}
+function showRoles() {
 
 }
+function showEmployees() {
+
+}
+
 
 function updateEmployee() {
 
