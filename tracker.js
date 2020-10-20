@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
+var banner = require('./banner.js')
 
 var connection = mysql.createConnection({
   host: 'localhost',
@@ -18,6 +19,7 @@ var connection = mysql.createConnection({
 connection.connect((err) => {
   if (err) throw err;
   // run the start function after the connection is made to prompt the user
+  banner.banner();
   start();
 });
 
@@ -418,3 +420,6 @@ function updateEmployee() {
         })
     })
 }
+
+
+
