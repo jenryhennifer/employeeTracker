@@ -183,13 +183,20 @@ function addEmployee() {
                 name: "lastName",
                 message: "Last Name: ",
               },
+              {
+                type: "list",
+                name: "role",
+                message: "Role: ",
+                choices: roleNames,
+              }
             ])
             .then((answer) => {
+                const chosenRole = res.find((role) => role.title === answer.role)
               connection.query("INSERT INTO employees SET ?", [
                 {
                   first_name: answer.firstName,
                   last_name: answer.lastName,
-                  role_id: roleList[0].id,
+                  role_id: chosenRole.id,
                   manager_id: null,
                 },
               ]);
@@ -198,13 +205,11 @@ function addEmployee() {
         } else {
           //NEED TO ACCESS ROLES CHECK IF YOU CAN SELECT FROM BOTH :)
           connection.query(
-            "SELECT * FROM employees WHERE role_id = 1",
+            "SELECT * FROM employeeTracker.employees WHERE manager_id IS null",
             (err, response) => {
               if (err) throw err;
-
-              const managerNames = response.map((name) => name.first_name);
-              const managerList = response;
-
+            //   const managers = response.filter((manager) => {parseInt(manager.manager_id) < 1})
+              const managerList = response.map((manager) => manager.first_name.concat(" ", manager.last_name))
               inquirer
                 .prompt([
                   {
@@ -227,21 +232,31 @@ function addEmployee() {
                     type: "list",
                     name: "manager",
                     message: "Manager: ",
-                    choices: managerNames,
+                    choices: managerList,
                   },
                 ])
                 .then((answer) => {
-                  var manager = managerList.find(
-                    (man) => man.first_name === answer.manager
-                  );
-                  var role = roleList.find((r) => r.title === answer.role);
+                    console.log(answer.manager)
 
+                    const chosenRole = res.find((role) => role.title === answer.role)
+
+                    var chosenManager = answer.manager;
+                    var man = chosenManager.split(" ");
+
+                    var choice = response.find((manager) => {
+                        if (manager.first_name === man[0] && manager.last_name === man[1]){
+                            return manager.id
+                        }
+                    })
+
+                  console.log(choice)
+                  
                     connection.query("INSERT INTO employees SET ?", [
                     {
                       first_name: answer.firstName,
                       last_name: answer.lastName,
-                      role_id: role.id,
-                      manager_id: manager.id,
+                      role_id: chosenRole.id,
+                      manager_id: choice.id,
                     },
                   ]);
                   start();
