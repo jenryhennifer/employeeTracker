@@ -14,20 +14,21 @@ CREATE TABLE roles(
   title VARCHAR(30) NOT NULL,
   salary VARCHAR(30),
   dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES departments(id),
   PRIMARY KEY (id)
-
 );
 
 -- creates a first role as manager
-INSERT INTO roles(id,title)
-VALUES (1,'Manager');
+INSERT INTO roles(id,title,salary)
+VALUES (1,'Manager',100000);
 
 CREATE TABLE employees(
   id INT NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  role_id VARCHAR(30) NOT NULL,
-  manager_id VARCHAR(30),
+  role_id INT NOT NULL,
+  manager_id INT,
+  FOREIGN KEY (role_id) REFERENCES roles(id),
   PRIMARY KEY (id)
 );
 
