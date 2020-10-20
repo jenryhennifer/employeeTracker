@@ -1,19 +1,19 @@
-var mysql = require('mysql');
-var inquirer = require('inquirer');
-var banner = require('./banner.js')
+var mysql = require("mysql");
+var inquirer = require("inquirer");
+var banner = require("./banner.js");
 
 var connection = mysql.createConnection({
-  host: 'localhost',
+  host: "localhost",
 
   // Your port; if not 3306
   port: 3306,
 
   // Your username
-  user: 'root',
+  user: "root",
 
   // Your password
-  password: 'password',
-  database: 'employeeTracker',
+  password: "password",
+  database: "employeeTracker",
 });
 
 connection.connect((err) => {
@@ -27,15 +27,15 @@ function start() {
   inquirer
     .prompt([
       {
-        type: 'list',
-        name: 'AddViewUpdate',
-        message: 'Would you like to:',
+        type: "list",
+        name: "AddViewUpdate",
+        message: "Would you like to:",
         choices: [
-          'Add Resource',
-          'Delete Resource',
-          'View Resource',
-          'Update Employee',
-          'Quit',
+          "Add Resource",
+          "Delete Resource",
+          "View Resource",
+          "Update Employee",
+          "Quit",
         ],
       },
     ])
@@ -43,21 +43,19 @@ function start() {
       console.log(res);
 
       switch (res.AddViewUpdate) {
-        case 'Add Resource':
+        case "Add Resource":
           return add();
-        case 'Delete Resource':
+        case "Delete Resource":
           return deleteRequest();
-        case 'View Resource':
+        case "View Resource":
           return view();
-        case 'Update Employee':
+        case "Update Employee":
           return updateEmployee();
         default:
-          return console.log('goodbye');
+          return console.log("goodbye");
       }
     });
 }
-var mysql = require('mysql');
-var inquirer = require('inquirer');
 
 function add() {
   inquirer
@@ -84,7 +82,6 @@ function add() {
       }
     });
 }
-
 //functions for ADD
 function addDepartment() {
   inquirer
@@ -188,10 +185,10 @@ function addEmployee() {
                 name: "role",
                 message: "Role: ",
                 choices: roleNames,
-              }
+              },
             ])
             .then((answer) => {
-                const chosenRole = res.find((role) => role.title === answer.role)
+              const chosenRole = res.find((role) => role.title === answer.role);
               connection.query("INSERT INTO employees SET ?", [
                 {
                   first_name: answer.firstName,
@@ -208,8 +205,10 @@ function addEmployee() {
             "SELECT * FROM employeeTracker.employees WHERE manager_id IS null",
             (err, response) => {
               if (err) throw err;
-            //   const managers = response.filter((manager) => {parseInt(manager.manager_id) < 1})
-              const managerList = response.map((manager) => manager.first_name.concat(" ", manager.last_name))
+              //   const managers = response.filter((manager) => {parseInt(manager.manager_id) < 1})
+              const managerList = response.map((manager) =>
+                manager.first_name.concat(" ", manager.last_name)
+              );
               inquirer
                 .prompt([
                   {
@@ -236,22 +235,27 @@ function addEmployee() {
                   },
                 ])
                 .then((answer) => {
-                    console.log(answer.manager)
+                  console.log(answer.manager);
 
-                    const chosenRole = res.find((role) => role.title === answer.role)
+                  const chosenRole = res.find(
+                    (role) => role.title === answer.role
+                  );
 
-                    var chosenManager = answer.manager;
-                    var man = chosenManager.split(" ");
+                  var chosenManager = answer.manager;
+                  var man = chosenManager.split(" ");
 
-                    var choice = response.find((manager) => {
-                        if (manager.first_name === man[0] && manager.last_name === man[1]){
-                            return manager.id
-                        }
-                    })
+                  var choice = response.find((manager) => {
+                    if (
+                      manager.first_name === man[0] &&
+                      manager.last_name === man[1]
+                    ) {
+                      return manager.id;
+                    }
+                  });
 
-                  console.log(choice)
-                  
-                    connection.query("INSERT INTO employees SET ?", [
+                  console.log(choice);
+
+                  connection.query("INSERT INTO employees SET ?", [
                     {
                       first_name: answer.firstName,
                       last_name: answer.lastName,
@@ -268,110 +272,114 @@ function addEmployee() {
   });
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
 //functions for DELETE
 function deleteRequest() {
-  inquirer
-    .prompt({
-      type: 'list',
-      name: 'deleteChoice',
-      message: 'what would you like to delete?',
-      choices: ['Department', 'Role', 'Employee', 'Back'],
-    })
-    .then((res) => {
-      switch (res.deleteChoice) {
-        case 'Department':
-          return deleteDepartment();
-        case 'Role':
-          return deleteRole();
-        case 'Employee':
-          return deleteEmployee();
-        default:
-          start();
-      }
-    });
-}
+    inquirer
+      .prompt({
+        type: "list",
+        name: "deleteChoice",
+        message: "what would you like to delete?",
+        choices: ["Department", "Role", "Employee", "Back"],
+      })
+      .then((res) => {
+        switch (res.deleteChoice) {
+          case "Department":
+            return deleteDepartment();
+          case "Role":
+            return deleteRole();
+          case "Employee":
+            return deleteEmployee();
+          default:
+            start();
+        }
+      });
+  }
+  
 
 function deleteDepartment() {
-  connection.query('SELECT * FROM departments', (err, res) => {
+  connection.query("SELECT * FROM departments", (err, res) => {
     var departmentNames = res.map((dept) => dept.dept_name);
     inquirer
       .prompt({
-        type: 'list',
-        name: 'roleDept',
-        message: 'Choose a department to delete',
+        type: "list",
+        name: "roleDept",
+        message: "Choose a department to delete",
         choices: departmentNames,
       })
       .then((res) => {
         const name = res.roleDept;
-        connection.query(
-          'DELETE FROM departments WHERE dept_name = ?',
-          [name]
-        );
+        connection.query("DELETE FROM departments WHERE dept_name = ?", [name]);
         start();
       });
   });
 }
 
 function deleteRole() {
-  connection.query('SELECT * FROM roles', (err, res) => {
+  connection.query("SELECT * FROM roles", (err, res) => {
     var roleNames = res.map((name) => name.title);
     inquirer
       .prompt({
-        type: 'list',
-        name: 'roleName',
-        message: 'Choose a role to delete',
+        type: "list",
+        name: "roleName",
+        message: "Choose a role to delete",
         choices: roleNames,
       })
       .then((res) => {
         const name = res.roleName;
-        connection.query('DELETE FROM roles WHERE title = ?', [
-          name,
-        ]);
+        connection.query("DELETE FROM roles WHERE title = ?", [name]);
         start();
       });
   });
 }
 
 function deleteEmployee() {
-  connection.query('SELECT * FROM employees', (err, res) => {
+  connection.query("SELECT * FROM employees", (err, res) => {
     var employeeName = res.map((name) => name.last_name);
     inquirer
       .prompt({
-        type: 'list',
-        name: 'employeeNames',
-        message: 'Choose an employee to delete',
+        type: "list",
+        name: "employeeNames",
+        message: "Choose an employee to delete",
         choices: employeeName,
       })
       .then((res) => {
         const name = res.employeeNames;
-        connection.query(
-          'DELETE FROM employees WHERE last_name = ?',
-          [name]
-        );
+        connection.query("DELETE FROM employees WHERE last_name = ?", [name]);
         start();
       });
   });
 }
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 //functions for VIEW
 function view() {
   inquirer
     .prompt([
       {
-        type: 'list',
-        name: 'viewChoice',
-        message: 'What would you like to view?',
-        choices: ['All Departments', 'All Roles', 'All Employees', 'Back'],
+        type: "list",
+        name: "viewChoice",
+        message: "What would you like to view?",
+        choices: [
+          "All Departments",
+          "All Roles",
+          "All Employees",
+          "By Manager",
+          "Back",
+        ],
       },
     ])
     .then((res) => {
       switch (res.viewChoice) {
-        case 'All Departments':
+        case "All Departments":
           return showDepartments();
-        case 'All Roles':
+        case "All Roles":
           return showRoles();
-        case 'All Employees':
+        case "All Employees":
           return showEmployees();
+        case "By Manager":
+          return viewEmployeesByManager();
         default:
           return start();
       }
@@ -379,62 +387,115 @@ function view() {
 }
 
 function showDepartments() {
-  connection.query('SELECT * FROM departments', (err, res) => {
+  connection.query("SELECT * FROM departments", (err, res) => {
     if (err) throw err;
-    console.log('DEPARTMENTS');
+    console.log("DEPARTMENTS");
     console.table(res);
     start();
   });
 }
 function showRoles() {
-  connection.query('SELECT * FROM roles', (err, res) => {
+  connection.query("SELECT * FROM roles", (err, res) => {
     if (err) throw err;
-    console.log('ROLES');
+    console.log("ROLES");
     console.table(res);
     start();
   });
 }
 function showEmployees() {
-  connection.query('SELECT * FROM employees', (err, res) => {
+  connection.query("SELECT * FROM employees", (err, res) => {
     if (err) throw err;
-    console.log('EMPLOYEES');
+    console.log("EMPLOYEES");
     console.table(res);
     start();
   });
 }
+function viewEmployeesByManager() {
+    connection.query(
+      "SELECT * FROM employees WHERE manager_id IS null",
+      (err, res) => {
+        const managerList = res.map((manager) =>
+          manager.first_name.concat(" ", manager.last_name)
+        );
+        inquirer
+          .prompt({
+            type: "list",
+            name: "manager",
+            message: "Which manager would you like to view the employees for?",
+            choices: managerList,
+          })
+          .then((answer) => {
+            console.log(answer);
+            var chosenManager = answer.manager;
+            console.log(chosenManager);
+            var manSplit = chosenManager.split(" ");
+            console.log(manSplit);
+  
+            var choice = res.find((manager) => {
+              if (
+                manager.first_name === manSplit[0] &&
+                manager.last_name === manSplit[1]
+              ) {
+                return manager.id;
+              }
+            });
+            console.log(choice.id);
+            connection.query(
+              "SELECT * FROM employees WHERE manager_id = ?",
+              [choice.id],
+              (err, res) => {
+                console.log("EMPLOYEES UNDER: " + chosenManager);
+                console.table(res);
+                start();
+              }
+            );
+          });
+      }
+    );
+  }
+///////////////////////////////////////////////////////////////////////////////////////
+
 
 function updateEmployee() {
-    connection.query('SELECT * FROM employees', (err, res) => {
-        console.log(res)
-        const names = res.map((name) => name.last_name )
-        inquirer
-        .prompt({
-            type:'list',
-            name:'employeeName',
-            message:'Whose role would you like to update?',
-            choices: names
-        }).then((answer) =>{
-            var choiceID = res.find((lastName) => lastName.last_name === answer.employeeName)
-            connection.query('SELECT * FROM roles', (err,response) =>{
-                const updatedRoleList = response.map((role)=>role.title)
-                
-                inquirer
-                .prompt({
-                    type: 'list',
-                    name: 'newRole',
-                    message: 'What role would you like to change to?',
-                    choices: updatedRoleList
-                }).then((choice) =>{
-                    choiceID = choiceID.id;
-                    var roleID = response.find((title) => title.title === choice.newRole)
-                    roleID = roleID.id
-                    connection.query('UPDATE employees SET role_id = ? WHERE id = ?', [roleID, choiceID])
-                    start();
-                })
-            })
-        })
-    })
-}
+  connection.query("SELECT * FROM employees", (err, res) => {
+    console.log(res);
+    const names = res.map((name) => name.last_name);
+    inquirer
+      .prompt({
+        type: "list",
+        name: "employeeName",
+        message: "Whose role would you like to update?",
+        choices: names,
+      })
+      .then((answer) => {
+        var choiceID = res.find(
+          (lastName) => lastName.last_name === answer.employeeName
+        );
+        connection.query("SELECT * FROM roles", (err, response) => {
+          const updatedRoleList = response.map((role) => role.title);
 
+          inquirer
+            .prompt({
+              type: "list",
+              name: "newRole",
+              message: "What role would you like to change to?",
+              choices: updatedRoleList,
+            })
+            .then((choice) => {
+              choiceID = choiceID.id;
+              var roleID = response.find(
+                (title) => title.title === choice.newRole
+              );
+              roleID = roleID.id;
+              connection.query(
+                "UPDATE employees SET role_id = ? WHERE id = ?",
+                [roleID, choiceID]
+              );
+              start();
+            });
+        });
+      });
+  });
+}
 
 
