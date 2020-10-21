@@ -1,7 +1,9 @@
 # Employee Tracker
 
 ## Installation
+GitHub:  https://github.com/jenryhennifer/employeeTracker
 
+YouTube Demo:  https://www.youtube.com/watch?v=7gOH9BgTj5E&feature=youtu.be
 
 ## Tech Used
 
@@ -18,13 +20,14 @@
 
 ## Sample
 
+![sample].(/images/SAMPLE.png)
+
 
 <hr />
 
 ## Description
 
 The purpose of this project was to create a Content Management System (CMS) to manage employees of a company. The user is given the opprotunity to add, delete, or view departments, roles, and employees. 
-
 
 ```
 var connection = mysql.createConnection({

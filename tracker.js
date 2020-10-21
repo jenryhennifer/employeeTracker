@@ -40,7 +40,6 @@ function start() {
       },
     ])
     .then((res) => {
-      console.log(res);
 
       switch (res.AddViewUpdate) {
         case 'Add Resource':
@@ -68,7 +67,6 @@ function add() {
       },
     ])
     .then((res) => {
-      console.log(res);
 
       switch (res.addChoice) {
         case 'Department':
@@ -236,8 +234,6 @@ function addEmployee() {
                   },
                 ])
                 .then((answer) => {
-                  console.log(answer.manager);
-
                   var chosenRole = res.find(
                     (role) => role.title === answer.role
                   );
@@ -253,8 +249,6 @@ function addEmployee() {
                       return manager.id;
                     }
                   });
-
-                  console.log(choice);
 
                   connection.query('INSERT INTO employees SET ?', [
                     {
@@ -357,7 +351,6 @@ function deleteEmployee() {
           }
         });
         choice = choice.id;
-        console.log(choice);
 
         connection.query('DELETE FROM employees WHERE id = ?', [choice]);
         start();
@@ -439,11 +432,8 @@ function viewEmployeesByManager() {
           choices: managerList,
         })
         .then((answer) => {
-          console.log(answer);
           var chosenManager = answer.manager;
-          console.log(chosenManager);
           var manSplit = chosenManager.split(' ');
-          console.log(manSplit);
 
           var choice = res.find((manager) => {
             if (
@@ -453,7 +443,6 @@ function viewEmployeesByManager() {
               return manager.id;
             }
           });
-          console.log(choice.id);
           connection.query(
             'SELECT * FROM employees WHERE manager_id = ?',
             [choice.id],
@@ -473,7 +462,6 @@ function viewEmployeesByManager() {
 
 function updateEmployee() {
   connection.query('SELECT * FROM employees', (err, res) => {
-    console.log(res);
     const employeeNames = res.map((name) =>
       name.first_name.concat(' ', name.last_name)
     );
@@ -486,11 +474,8 @@ function updateEmployee() {
         choices: employeeNames,
       })
       .then((answer) => {
-        console.log(answer);
         var chosenEmployee = answer.employeeName;
-        console.log(chosenEmployee);
         var empSplit = chosenEmployee.split(' ');
-        console.log(empSplit);
 
         var empChoice = res.find((emp) => {
           if (emp.first_name === empSplit[0] && emp.last_name === empSplit[1]) {
@@ -498,12 +483,9 @@ function updateEmployee() {
           }
         });
 
-        console.log(empChoice.id);
-
         connection.query('SELECT * FROM roles', (err, response) => {
           var role = response.map((role) => role.title);
 
-          console.log(role);
           inquirer
             .prompt({
               type: 'list',
